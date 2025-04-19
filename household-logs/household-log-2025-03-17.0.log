@@ -1,0 +1,28 @@
+2025-03-17 13:43:35 [background-preinit] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 6.2.5.Final
+2025-03-17 13:43:35 [main] INFO  c.c.f.household.HouseholdApplication - Starting HouseholdApplication using Java 21.0.6 on senanism with PID 12396 (C:\Users\senan.ism\Desktop\household-web-summer-24-25-iteration1\household-web-summer-24-25-iteration1\target\classes started by senan.ism in C:\Users\senan.ism\Desktop\household-web-summer-24-25-iteration1\household-web-summer-24-25-iteration1)
+2025-03-17 13:43:35 [main] INFO  c.c.f.household.HouseholdApplication - The following 1 profile is active: "local"
+2025-03-17 13:43:37 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-03-17 13:43:37 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 593 ms. Found 11 JPA repository interfaces.
+2025-03-17 13:43:39 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port(s): 8080 (http)
+2025-03-17 13:43:39 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2025-03-17 13:43:39 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2025-03-17 13:43:39 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/9.0.65]
+2025-03-17 13:43:40 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2025-03-17 13:43:40 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 4830 ms
+2025-03-17 13:43:40 [main] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-03-17 13:43:40 [main] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 5.6.11.Final
+2025-03-17 13:43:41 [main] INFO  o.h.annotations.common.Version - HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2025-03-17 13:43:41 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2025-03-17 13:43:42 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2025-03-17 13:43:42 [main] INFO  org.hibernate.dialect.Dialect - HHH000400: Using dialect: org.hibernate.dialect.PostgreSQL95Dialect
+2025-03-17 13:43:44 [main] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2025-03-17 13:43:44 [main] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-03-17 13:43:46 [main] INFO  o.s.s.web.DefaultSecurityFilterChain - Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@46573cfe, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@7ead0b51, org.springframework.security.web.context.SecurityContextPersistenceFilter@5bc1903, org.springframework.security.web.header.HeaderWriterFilter@761f1a28, org.springframework.security.web.csrf.CsrfFilter@d1973e8, org.springframework.security.web.authentication.logout.LogoutFilter@4e68aede, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter@ab2e887, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@1ecd09d5, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@36f438f1, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@2f7d8a7c, org.springframework.security.web.session.SessionManagementFilter@71c91121, org.springframework.security.web.access.ExceptionTranslationFilter@1892865f, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@6067e7c1]
+2025-03-17 13:43:46 [main] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2025-03-17 13:43:47 [main] INFO  o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2025-03-17 13:43:47 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port(s): 8080 (http) with context path ''
+2025-03-17 13:43:47 [main] INFO  c.c.f.household.HouseholdApplication - Started HouseholdApplication in 13.664 seconds (JVM running for 14.717)
+2025-03-17 13:43:47 [http-nio-8080-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-03-17 13:43:47 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2025-03-17 13:43:47 [http-nio-8080-exec-1] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 3 ms
+2025-03-17 13:43:51 [http-nio-8080-exec-2] INFO  c.c.f.h.c.RegistrationController - User - senan.ism logged in successfully

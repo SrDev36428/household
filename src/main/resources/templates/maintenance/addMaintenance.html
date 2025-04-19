@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="UTF-8">
+  <title>Add Maintenance</title>
+  <link rel="stylesheet" type="text/css" href="../../static/styles/style.css" th:href="@{'/styles/style.css'}">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+  <link href="https://fonts.googleapis.com/css?family=Poppins:600&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous"/>
+  <script src="https://kit.fontawesome.com/a81368914c.js"></script>
+  <meta name="viewport" content="width=device-width initial-scale=1">
+
+</head>
+<body>
+
+<img class="wave" src="../../static/images/wave.png" th:src="@{/images/wave.png}">
+<div class="container">
+  <div class="img">
+    <img src="../../static/images/bg.svg" th:src="@{/images/bg.svg}">
+  </div>
+
+  <div class="login-content">
+    <form th:action="@{/household/{householdId}/maintenance(householdId=${householdId})}"
+          th:object="${maintenance}"
+          method="post">
+
+      <h3 class="title text-capitalize mt-2">Add Maintenance</h3>
+
+      <!-- Title -->
+      <div class="form-floating mb-3">
+        <input type="text" th:field="*{title}" placeholder="Title" class="form-control" required>
+        <label for="title">Title</label>
+      </div>
+      <p th:if="${#fields.hasErrors('title')}" th:errorclass="error" th:errors="*{title}"></p>
+
+      <!-- Description -->
+      <div class="form-floating mb-3">
+        <input type="text" th:field="*{description}" placeholder="Description" class="form-control">
+        <label for="description">Description</label>
+      </div>
+
+      <!-- Assignee -->
+      <div class="form-group blu-margin">
+        <label for="assignee-select">Select Assignee</label>
+        <select th:field="*{assignee}" id="assignee-select" name="assignee" class="form-control">
+          <option th:each="assigneee : ${assignee}"
+                  th:if="${assigneee != null}"
+                  th:value="${assigneee.id}"
+                  th:text="${assigneee.user.username}">
+          </option>
+        </select>
+      </div>
+
+      <!-- RecurringType -->
+      <div class="form-group blu-margin">
+        <label for="recurringType">Select Frequency Period</label>
+        <select th:field="*{recurringType}" class="form-control" name="recurringType" id="recurringType">
+          <option th:each="frequencyType : ${T(cz.cvut.fit.household.datamodel.enums.RecurringType).values()}"
+                  th:value="${frequencyType}"
+                  th:text="${frequencyType.recurringType}">
+          </option>
+        </select>
+      </div>
+
+      <br/>
+
+      <!-- NONE-specific fields (optional) -->
+      <div id="noneDiv" style="display: none;" class="form-group blu-margin">
+        <label for="timeNone">Select time:</label>
+        <input type="time" id="timeNone" name="timeNone"><br/>
+        <label for="dateNone">Select date:</label>
+        <input type="date" id="dateNone" name="dateNone">
+      </div>
+
+      <!-- Interval label (for daily, weekly, monthly, yearly) -->
+      <div id="intervalDayLabel" style="display: none;" class="form-group blu-margin">
+        <span>Interval (days):</span><br/>
+      </div>
+      <div id="intervalWeekLabel" style="display: none;" class="form-group blu-margin">
+        <span>Interval (weeks):</span><br/>
+      </div>
+      <div id="intervalMonthLabel" style="display: none;" class="form-group blu-margin">
+        <span>Interval (months):</span><br/>
+      </div>
+      <div id="intervalYearLabel" style="display: none;" class="form-group blu-margin">
+        <span>Interval (years):</span><br/>
+      </div>
+      <p style="color: #f44336" th:if="${rejectInterval != null}" th:text="${rejectInterval}"></p>
+
+      <!-- Interval Input -->
+      <div id="intervalInputDiv" style="display: none;" class="form-group blu-margin">
+        <input type="number" th:field="*{interval}" id="interval" name="interval" class="form-control"><br/>
+      </div>
+
+      <!-- Single time input (used for weekly/monthly/yearly if you only want 1 time per day) -->
+      <div id="timeDiv" style="display: none;" class="form-group blu-margin">
+        <label for="time">Select time:</label>
+        <input type="time" th:field="*{time}" id="time" name="time" min="00:00" max="23:59">
+      </div>
+      <p style="color: #f44336" th:if="${rejectTime != null}" th:text="${rejectTime}"></p>
+
+      <!-- WEEKLY pattern checkboxes -->
+      <div id="weeklyDiv" style="display: none;" class="form-group blu-margin">
+        <span>Select day(s):</span><br/>
+        <input type="checkbox" id="mondayWeekly" name="mondayWeekly" value="1">
+        <label for="mondayWeekly">Monday</label>
+
+        <input type="checkbox" id="tuesdayWeekly" name="tuesdayWeekly" value="1">
+        <label for="tuesdayWeekly">Tuesday</label>
+
+        <input type="checkbox" id="wednesdayWeekly" name="wednesdayWeekly" value="1">
+        <label for="wednesdayWeekly">Wednesday</label>
+
+        <input type="checkbox" id="thursdayWeekly" name="thursdayWeekly" value="1">
+        <label for="thursdayWeekly">Thursday</label>
+
+        <input type="checkbox" id="fridayWeekly" name="fridayWeekly" value="1">
+        <label for="fridayWeekly">Friday</label>
+
+        <input type="checkbox" id="saturdayWeekly" name="saturdayWeekly" value="1">
+        <label for="saturdayWeekly">Saturday</label>
+
+        <input type="checkbox" id="sundayWeekly" name="sundayWeekly" value="1">
+        <label for="sundayWeekly">Sunday</label>
+
+        <input type="hidden" th:field="*{daysOfWeekPattern}" id="daysOfWeekPattern" name="daysOfWeekPattern">
+        <br/>
+      </div>
+      <p style="color: #f44336" th:if="${rejectWeekPattern != null}" th:text="${rejectWeekPattern}"></p>
+
+      <!-- DAILY multiple times container -->
+      <div id="dailyTimesContainer" style="display: none;" class="form-group blu-margin">
+        <label>Daily Time(s):</label><br/>
+        <!-- If you have an existing list in your model, you can render it here -->
+        <div th:each="timeObj, stat : ${maintenance.dailyTimes}">
+          <input type="time"
+                 th:id="'dailyTime' + ${stat.index}"
+                 th:name="'dailyTimes[' + ${stat.index} + ']'"
+                 th:value="${timeObj}" />
+        </div>
+        <button type="button" onclick="addDailyTimeInput()">+ Add Another Time</button>
+      </div>
+
+      <!-- MONTHLY multiple days container -->
+      <div id="monthlyDaysContainer" style="display: none;" class="form-group blu-margin">
+        <label>Day(s) of the Month:</label><br/>
+        <div th:each="day, stat : ${maintenance.daysOfMonth}">
+          <input type="number"
+                 min="1" max="31"
+                 th:id="'dayOfMonth' + ${stat.index}"
+                 th:name="'daysOfMonth[' + ${stat.index} + ']'"
+                 th:value="${day}" />
+        </div>
+        <button type="button" onclick="addMonthlyDayInput()">+ Add Another Day</button>
+      </div>
+      <p style="color: #f44336" th:if="${rejectDayOfMonth != null}" th:text="${rejectDayOfMonth}"></p>
+
+      <!-- YEARLY multiple dates container -->
+      <div id="yearlyDatesContainer" style="display: none;" class="form-group blu-margin">
+        <label>Date(s) in the Year:</label><br/>
+
+        <!-- Render existing yearly dates from the model -->
+        <div th:each="dateObj, stat : ${maintenance.yearlyDates}">
+          <input type="date"
+                 th:id="'yearlyDate' + ${stat.index}"
+                 th:name="'yearlyDates[' + ${stat.index} + ']'"
+                 th:value="${#temporals.format(dateObj, 'yyyy-MM-dd')}" />
+          <br/>
+        </div>
+
+        <!-- Button to add more date inputs dynamically -->
+        <button type="button" onclick="addYearlyDateInput()">+ Add Another Date</button>
+      </div>
+
+      <!-- Start Date -->
+      <div id="startDateDiv" style="display: block" class="form-floating mb-3">
+        <input type="date" th:field="*{startDate}" name="startDate" placeholder="Start Date" class="form-control">
+        <label for="startDate">Start date</label>
+      </div>
+      <p style="color: #f44336" th:if="${rejectStartDate != null}" th:text="${rejectStartDate}"></p>
+
+      <!-- End Date -->
+      <div id="endDateDiv" style="display: block" class="form-floating mb-3">
+        <input type="date" th:field="*{endDate}" name="endDate" placeholder="End Date" class="form-control">
+        <label for="endDate">End Date</label>
+      </div>
+      <p style="color: #f44336" th:if="${rejectEndDate != null}" th:text="${rejectEndDate}"></p>
+
+      <!-- Hidden Creator (if needed) -->
+      <div style="display:none;">
+        <input type="hidden" th:field="*{creator}" id="creator" name="creator" th:value="${assignee[0].id}">
+      </div>
+
+      <input type="submit" class="btn" value="Add maintenance">
+
+    </form>
+
+    <!-- WEEKLY pattern checkboxes script -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const checkboxes = document.querySelectorAll('input[type="checkbox"][name$="Weekly"]');
+        let daysOfWeekPattern = "0000000";
+
+        checkboxes.forEach(function (checkbox) {
+          checkbox.addEventListener("change", function () {
+            const dayIndex = Array.from(checkboxes).indexOf(checkbox);
+            if (dayIndex >= 0 && dayIndex < 7) {
+              daysOfWeekPattern =
+                      daysOfWeekPattern.substring(0, dayIndex) +
+                      (checkbox.checked ? "1" : "0") +
+                      daysOfWeekPattern.substring(dayIndex + 1);
+
+              document.getElementById("daysOfWeekPattern").value = daysOfWeekPattern;
+            }
+          });
+        });
+      });
+    </script>
+
+    <!-- Show/hide elements based on recurringType -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const recurringTypeSelect = document.getElementById('recurringType');
+        recurringTypeSelect.addEventListener('change', handleRecurringTypeChange);
+
+        // On page load, trigger the change so the correct fields show up
+        handleRecurringTypeChange();
+      });
+
+      function handleRecurringTypeChange() {
+        const val = document.getElementById('recurringType').value;
+
+        // Hide everything by default
+        document.getElementById("noneDiv").style.display = "none";
+        document.getElementById("intervalDayLabel").style.display = "none";
+        document.getElementById("intervalWeekLabel").style.display = "none";
+        document.getElementById("intervalMonthLabel").style.display = "none";
+        document.getElementById("intervalYearLabel").style.display = "none";
+        document.getElementById("intervalInputDiv").style.display = "none";
+        document.getElementById("timeDiv").style.display = "none";
+        document.getElementById("weeklyDiv").style.display = "none";
+        document.getElementById("dailyTimesContainer").style.display = "none";
+        document.getElementById("monthlyDaysContainer").style.display = "none";
+        document.getElementById("yearlyDatesContainer").style.display = "none";
+
+        // Show start/end date by default (unless you have logic to hide them)
+        document.getElementById("startDateDiv").style.display = "block";
+        document.getElementById("endDateDiv").style.display = "block";
+
+        if (val === 'NONE') {
+          document.getElementById("noneDiv").style.display = "block";
+
+        } else if (val === 'DAILY') {
+          // Show daily interval label
+          document.getElementById("intervalDayLabel").style.display = "block";
+          document.getElementById("intervalInputDiv").style.display = "block";
+          // Show multiple daily times container
+          document.getElementById("dailyTimesContainer").style.display = "block";
+
+        } else if (val === 'WEEKLY') {
+          document.getElementById("intervalWeekLabel").style.display = "block";
+          document.getElementById("intervalInputDiv").style.display = "block";
+          // Show weekly checkboxes
+          document.getElementById("weeklyDiv").style.display = "block";
+          // Show single time input (if you want a single time for weekly)
+          document.getElementById("timeDiv").style.display = "block";
+
+        } else if (val === 'MONTHLY') {
+          document.getElementById("intervalMonthLabel").style.display = "block";
+          document.getElementById("intervalInputDiv").style.display = "block";
+          // Show multiple days in the month
+          document.getElementById("monthlyDaysContainer").style.display = "block";
+          // Show single time input (if you want one time for each monthly day)
+          document.getElementById("timeDiv").style.display = "block";
+
+        } else if (val === 'YEARLY') {
+          document.getElementById("intervalYearLabel").style.display = "block";
+          document.getElementById("intervalInputDiv").style.display = "block";
+          // Show multiple yearly dates
+          document.getElementById("yearlyDatesContainer").style.display = "block";
+          // Show single time input (if you want one time for each date)
+          document.getElementById("timeDiv").style.display = "block";
+        }
+      }
+    </script>
+
+    <!-- Script to add multiple daily time inputs dynamically -->
+    <script>
+      function addDailyTimeInput() {
+        const container = document.getElementById('dailyTimesContainer');
+        // Count how many time inputs already exist
+        const timeInputs = container.querySelectorAll('input[type="time"]');
+        const newIndex = timeInputs.length;
+
+        // Create a new input for the next time
+        const newInput = document.createElement('input');
+        newInput.type = 'time';
+        newInput.name = 'dailyTimes[' + newIndex + ']';
+        newInput.id = 'dailyTime' + newIndex;
+
+        container.appendChild(newInput);
+        container.appendChild(document.createElement('br'));
+      }
+    </script>
+
+    <!-- Script to add multiple monthly days -->
+    <script>
+      function addMonthlyDayInput() {
+        const container = document.getElementById('monthlyDaysContainer');
+        // Count existing day-of-month inputs
+        const dayInputs = container.querySelectorAll('input[type="number"]');
+        const newIndex = dayInputs.length;
+
+        const newInput = document.createElement('input');
+        newInput.type = 'number';
+        newInput.min = '1';
+        newInput.max = '31';
+        newInput.name = 'daysOfMonth[' + newIndex + ']';
+        newInput.id = 'dayOfMonth' + newIndex;
+
+        container.appendChild(newInput);
+        container.appendChild(document.createElement('br'));
+      }
+    </script>
+
+    <!-- Script to add multiple yearly dates -->
+    <script>
+      function addYearlyDateInput() {
+        const container = document.getElementById('yearlyDatesContainer');
+        // Count existing <input type="date"> fields
+        const dateInputs = container.querySelectorAll('input[type="date"]');
+        const newIndex = dateInputs.length; // Next index
+
+        // Create a new <input> of type="date"
+        const newInput = document.createElement('input');
+        newInput.type = 'date';
+        // Use bracketed naming so Spring can bind it to List<LocalDate> or List<Date>
+        newInput.name = 'yearlyDates[' + newIndex + ']';
+        newInput.id = 'yearlyDate' + newIndex;
+
+        container.appendChild(newInput);
+        container.appendChild(document.createElement('br'));
+      }
+    </script>
+
+  </div>
+
+</div>
+
+<script type="text/javascript" src="../../static/js/test.js" th:src="@{/js/test.js}"></script>
+</body>
+</html>

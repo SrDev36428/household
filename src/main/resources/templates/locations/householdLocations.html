@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Locations</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" type="text/css" href="../../static/styles/style.css" th:href="@{'/styles/style.css'}">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous" />
+    <script src="https://kit.fontawesome.com/a81368914c.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+
+<div style="display: flex">
+    <div th:insert="~{fragments/fragments :: sidebar}"></div>
+
+    <div id="margin-100-for-shifting" style="flex-grow: 1; margin-left: 100px;">
+        <div class="p-4">
+
+            <div class="d-flex justify-content-between">
+                <h3>Available locations:</h3>
+                <div>
+                    <a th:href="@{'/household/' + ${householdId} + '/locations/add'}">
+                        <button class="create-household-btn">+ Add location</button>
+                    </a>
+                </div>
+            </div>
+            <table class="mt-4">
+                <thead>
+                <tr class="bg-dark text-white">
+                    <th>Title</th>
+                    <th>Detail</th>
+                    <th>Edit</th>
+                    <th>Delete</th>
+                </tr>
+                </thead>
+                <tr th:each="location : ${availableLocations}">
+                    <td th:text="${location.title}">Title</td>
+                    <td>
+                        <a th:href="@{'/household/' + ${householdId} + '/locations/' + ${location.id}}">Detail</a>
+                    </td>
+                    <td>
+                        <a th:href="@{'/household/' + ${householdId} + '/locations/' + ${location.id} + '/edit'}">Edit</a>
+                    </td>
+                    <td>
+                        <a th:href="@{'/household/' + ${householdId} + '/locations/' + ${location.id} + '/delete'}" onclick="showConfirmation(event, this)">Delete</a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="../../static/js/test.js" th:src="@{/js/test.js}"></script>
+</body>
+</html>

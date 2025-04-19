@@ -1,0 +1,81 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <!-- Drop column if exists -->
+    <changeSet id="20240514-1" author="u238">
+        <dropColumn tableName="maintenance" columnName="deadline" />
+    </changeSet>
+
+    <!-- Rename columns -->
+    <changeSet id="20240514-2" author="u238">
+        <renameColumn tableName="maintenance" oldColumnName="task_resolution" newColumnName="resolution" columnDataType="BOOL"/>
+        <renameColumn tableName="maintenance" oldColumnName="task_state" newColumnName="active" columnDataType="BOOL"/>
+        <renameColumn tableName="maintenance" oldColumnName="reporter_id" newColumnName="creator_id" columnDataType="BIGINT"/>
+    </changeSet>
+
+    <!-- Create table if not exists -->
+    <changeSet id="20240514-3" author="u238">
+        <createTable tableName="recurring_pattern">
+            <column name="id" type="SERIAL">
+                <constraints primaryKey="true" primaryKeyName="recurring_pattern_pkey"/>
+            </column>
+            <column name="day_of_month" type="INTEGER"/>
+            <column name="day_of_week" type="INTEGER"/>
+            <column name="interval" type="INTEGER"/>
+            <column name="month_of_year" type="INTEGER"/>
+            <column name="recurring_type" type="INTEGER"/>
+            <column name="time_of_day" type="TIME"/>
+            <column name="maintenance_id" type="INTEGER">
+                <constraints foreignKeyName="fk_maintenance" referencedTableName="maintenance" referencedColumnNames="id"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <!-- Insert data into the new table -->
+    <changeSet id="20240514-4" author="u238">
+        <sql>
+            INSERT INTO recurring_pattern (day_of_month, day_of_week, interval, month_of_year, recurring_type, time_of_day, maintenance_id)
+            SELECT
+            CASE WHEN m.frequency = 2 THEN 1 ELSE 0 END AS day_of_month,
+            CASE WHEN m.frequency = 1 THEN 1 ELSE 0 END AS day_of_week,
+            m.frequency AS interval,
+            CASE WHEN m.frequency = 3 THEN 1 ELSE 0 END AS month_of_year,
+            m.frequency_period AS recurring_type,
+            '00:00:00' AS time_of_day,
+            m.id AS maintenance_id
+            FROM maintenance m;
+        </sql>
+    </changeSet>
+
+    <!-- Drop multiple columns from maintenance -->
+    <changeSet id="20240514-5" author="u238">
+        <dropColumn tableName="maintenance" columnName="frequency" />
+        <dropColumn tableName="maintenance" columnName="frequency_period" />
+    </changeSet>
+
+    <!-- Drop multiple columns from maintenance_task -->
+    <changeSet id="20240514-6" author="u238">
+        <dropColumn tableName="maintenance_task" columnName="start_date" />
+        <dropColumn tableName="maintenance_task" columnName="task_resolution" />
+        <dropColumn tableName="maintenance_task" columnName="reporter_id" />
+        <dropColumn tableName="maintenance_task" columnName="description" />
+        <dropColumn tableName="maintenance_task" columnName="title" />
+        <dropColumn tableName="maintenance_task" columnName="assignee_id" />
+    </changeSet>
+
+    <!-- Add new column to maintenance_task and set default value for existing rows -->
+    <changeSet id="20240514-7" author="u238">
+        <addColumn tableName="maintenance_task">
+            <column name="closing_date" type="TIMESTAMP">
+                <constraints nullable="false" />
+            </column>
+        </addColumn>
+        <sql>
+            UPDATE maintenance_task SET closing_date = CURRENT_DATE WHERE closing_date IS NULL;
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <meta charset="UTF-8">
+    <title>SignUp</title>
+    <link rel="stylesheet" type="text/css" href="../static/styles/style.css" th:href="@{'/styles/style.css'}">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:600&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/a81368914c.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        body{
+            overflow: auto;
+        }
+        h1{
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
+        .login-content .input-div{
+            padding: 0px;
+        }
+
+    </style>
+</head>
+
+<body>
+<img class="wave" src="../static/images/wave.png" th:src="@{/images/wave.png}">
+<div class="container">
+    <div class="img">
+        <img src="../static/images/bg.svg" th:src="@{/images/bg.svg}">
+    </div>
+    <div class="login-content">
+        <form action="#" th:action="@{/signup}" th:object="${user}" method="post" id="sign-up-form">
+            <div style="display: flex; align-items: center;">
+                <img src="../static/images/avatar.svg" th:src="@{/images/avatar.svg}">
+                <h1 class="title" style="margin-left: 1rem;">Signup</h1>
+            </div>
+
+            <div class="input-div">
+                <div class="i">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="div">
+                    <h5>Username</h5>
+                    <input type="text" th:field="*{user.username}" class="input">
+                </div>
+            </div>
+            <p th:if="${#fields.hasErrors('user.username')}" th:errorclass="error" th:errors="*{user.username}"></p>
+            <div class="input-div">
+                <div class="i">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="div">
+                    <h5>Firstname</h5>
+                    <input type="text" th:field="*{user.firstName}" class="input">
+                </div>
+            </div>
+            <p th:if="${#fields.hasErrors('user.firstName')}" th:errorclass="error" th:errors="*{user.firstName}"></p>
+            <div class="input-div">
+                <div class="i">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="div">
+                    <h5>Lastname</h5>
+                    <input type="text" th:field="*{user.lastName}" class="input">
+                </div>
+            </div>
+            <p th:if="${#fields.hasErrors('user.lastName')}" th:errorclass="error" th:errors="*{user.lastName}"></p>
+            <div class="input-div">
+                <div class="i">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="div">
+                    <h5>Email</h5>
+                    <input type="email" th:field="*{user.email}" class="input">
+                </div>
+            </div>
+            <p th:if="${#fields.hasErrors('user.email')}" th:errorclass="error" th:errors="*{user.email}"></p>
+
+            <div class="input-div">
+                <div class="i">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <div class="div">
+                    <h5>Password</h5>
+                    <input type="password" th:field="*{user.password}" class="input">
+                </div>
+            </div>
+            <p th:if="${#fields.hasErrors('user.password')}" th:errorclass="error" th:errors="*{user.password}"></p>
+
+            <div class="input-div">
+                <div class="i">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <div class="div">
+                    <h5>Password confirmation</h5>
+                    <input type="password" th:field="*{passwordConfirmation}" class="input">
+                </div>
+            </div>
+
+            <div style="display: flex;margin-top: 1rem;">
+                <div style="flex: 50%;">
+                        <span class="login-btn">
+                            Already have an account?
+                            <a href="#" th:href="@{'/login'}" style="margin-right:10px;" >Login</a>
+                        </span>
+                </div>
+            </div>
+
+            <br>
+
+            <input type="submit" class="btn" value="sign up">
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript" src="../static/js/test.js" th:src="@{/js/test.js}">
+</script>
+</body>
+</html>

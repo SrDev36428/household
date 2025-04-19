@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+</head>
+
+<div th:fragment="sidebar">
+    <div>
+        <div style="background: #32be8f">
+            <div class="w3-sidebar w3-bar-block w3-border-right" id="sidebar">
+                <button onclick="w3_close()" class="w3-bar-item w3-large">Close &times;</button>
+                <div class="household-visibility">
+                    <h5> Current household: '<span th:text="${household.title}"></span>'</h5>
+                </div>
+                <a href="#" th:href="@{'/welcome'}" class="w3-bar-item w3-button">Main page</a>
+                <a th:href="@{'/household/' + ${householdId}}" class="w3-bar-item w3-button">Manage household</a>
+                <a th:href="@{'/household/' + ${householdId} + '/locations'}" class="w3-bar-item w3-button">Manage
+                    locations</a>
+                <a th:href="@{'/household/' + ${householdId} + '/items'}" class="w3-bar-item w3-button">Manage items</a>
+                <a th:href="@{'/household/' + ${householdId} + '/category'}" class="w3-bar-item w3-button">Manage
+                    categories</a>
+                <a th:href="@{'/household/' + ${householdId} + '/maintenance'}" class="w3-bar-item w3-button">Manage
+                    maintenances</a>
+                <a th:href="@{'/household/' + ${householdId} + '/maintenanceTask'}" class="w3-bar-item w3-button">My tasks</a>
+                <a th:href="@{'/household/' + ${household.id} + '/profile'}" class="w3-bar-item w3-button">Profile</a>
+                <a th:href="@{'/household/' + ${householdId} + '/logs'}" class="w3-bar-item w3-button">Logs</a>
+                <a href="#" th:href="@{'/logout'}" class="w3-bar-item w3-button">Logout</a>
+            </div>
+            <button class="w3-button w3-teal w3-xlarge" onclick="w3_open()">Menu</button>
+        </div>
+    </div>
+</div>
+
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <meta charset="UTF-8">
+    <title>SignUp</title>
+    <link rel="stylesheet" type="text/css" href="../static/styles/style.css" th:href="@{'/styles/style.css'}">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:600&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/a81368914c.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        body{
+            overflow: auto;
+        }
+        h1{
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
+        .login-content .input-div{
+            padding: 0px;
+        }
+
+    </style>
+</head>
+
+<body>
+<img class="wave" src="../static/images/wave.png" th:src="@{/images/wave.png}">
+<div class="container">
+    <div class="img">
+        <img src="../static/images/bg.svg" th:src="@{/images/bg.svg}">
+    </div>
+    <div class="login-content">
+        <form action="#" th:action="@{/signup}" th:object="${user}" method="post">
+            <div style="display: flex; align-items: center;">
+                <img src="../static/images/avatar.svg" th:src="@{/images/avatar.svg}">
+                <h1 class="title" style="margin-left: 1rem;">Signup</h1>
+            </div>
+
+            <div style="display: flex;margin-top: 1rem;">
+                <div style="flex: 50%;">
+                        <span class="login-btn">
+                            <a href="#" th:href="@{'/signup'}" style="margin-left:5px;">Back</a>
+                        </span>
+                </div>
+            </div>
+
+            <br>
+
+            <div class = "alert">
+                <strong>Something is wrong!</strong> Please try again!
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript" src="../static/js/test.js" th:src="@{/js/test.js}">
+</script>
+</body>
+</html>

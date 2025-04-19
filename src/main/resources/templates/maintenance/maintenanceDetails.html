@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Maintenance Details</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" type="text/css" href="../../static/styles/style.css" th:href="@{'/styles/style.css'}">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous"/>
+    <script src="https://kit.fontawesome.com/a81368914c.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+</head>
+<body>
+<div style="display: flex">
+    <div th:insert="~{fragments/fragments :: sidebar}"></div>
+
+
+    <div id="margin-100-for-shifting" style="flex-grow: 1; margin-left: 100px;">
+        <div class="p-4">
+
+            <div class="maintenanceTaskTable" style="margin-top: 20px">
+
+                <div class="d-flex justify-content-between">
+                    <h3 style="margin-top: auto">Details of Maintenance <span th:text="${maintenance.title}"></span>:
+                    </h3>
+                </div>
+                <div>&nbsp;&nbsp;</div>
+                <div class="maintenance-details-container">
+                    <div class="maintenance-details-left">
+                        <div class="maintenance-details-title">
+                            <h1>Maintenance Details - </h1>
+                            <h2 th:text="'Title:' + ${maintenance.title}">Title</h2>
+                        </div>
+                        <div class="maintenance-details-description">
+                            <h3>Description</h3>
+                            <p th:text="${maintenance.description}">Description</p>
+                        </div>
+                    </div>
+                    <div class="maintenance-details-right">
+                        <!-- Button actions -->
+                        <div class="button-section">
+                            <div th:if="${permission} and ${!taskState.taskState}">
+                                <a th:href="@{'/household/' + ${householdId} + '/maintenance/' + ${maintenanceId} + '/maintenanceTask/add'}">
+                                    <button class="household-btn">+ Generate MaintenanceTask</button>
+                                </a>
+                            </div>
+                            <div>&nbsp;&nbsp;</div>
+                            <div th:if="${permission}">
+                                <a th:href="@{'/household/' + ${householdId} + '/maintenance/' + ${maintenanceId} + '/detail/edit'}">
+                                    <button class="household-btn">+- Edit Maintenance</button>
+                                </a>
+                            </div>
+                            <div>&nbsp;&nbsp;</div>
+                            <div th:if="${permission}">
+                                <a th:href="@{'/household/' + ${householdId} + '/maintenance/' + ${maintenanceId} + '/delete'}"
+                                   onclick="return showConfirmation(event, this)">
+                                    <button class="household-btn">- Delete Maintenance</button>
+                                </a>
+                            </div>
+                        </div>
+                        <div>&nbsp;&nbsp;</div>
+
+                        <!-- Start Date / End Date -->
+                        <div class="maintenance-details-section">
+                            <h3>Start Date</h3>
+                            <p th:text="${maintenance.startDate}">Start Date</p>
+                        </div>
+                        <div class="maintenance-details-section">
+                            <h3>End Date</h3>
+                            <p th:text="${maintenance.endDate}">End Date</p>
+                        </div>
+
+                        <!-- Frequency & Interval -->
+                        <div class="maintenance-details-section">
+                            <h3>Frequency</h3>
+                            <p th:text="${maintenance.recurringType}">Frequency</p>
+                        </div>
+                        <div class="maintenance-details-section" th:if="${maintenance.recurringType != 'NONE'}">
+                            <h3>Interval</h3>
+                            <p th:text="${maintenance.interval}">Interval</p>
+                        </div>
+
+                        <!-- Switch-based Display for Each Recurring Type -->
+                        <div th:switch="${maintenance.recurringType.name()}">
+
+                            <!-- DAILY with multiple times -->
+                            <div th:case="'DAILY'" class="maintenance-details-section">
+                                <h3>Daily Time(s):</h3>
+                                <ul>
+                                    <!-- Each daily time in a separate list item -->
+                                    <li th:each="timeObj : ${maintenance.dailyTimes}"
+                                        th:text="${timeObj}">
+                                        08:00
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!-- WEEKLY with single time + daysOfWeekPattern -->
+                            <div th:case="'WEEKLY'" class="maintenance-details-section">
+                                <h3>Time:</h3>
+                                <p th:text="${maintenance.time}">HH:MM</p>
+                                <h3>Selected Days:</h3>
+                                <ul>
+                                    <!-- We check each index in daysOfWeekPattern; if '1', we display the day name -->
+                                    <li th:each="i : ${#numbers.sequence(0,6)}"
+                                        th:if="${maintenance.daysOfWeekPattern[i]} == '1'"
+                                        th:text="${T(java.util.Arrays).asList('Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday')[i]}">
+                                        Monday
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!-- MONTHLY with single time + multiple daysOfMonth -->
+                            <div th:case="'MONTHLY'" class="maintenance-details-section">
+                                <h3>Time:</h3>
+                                <p th:text="${maintenance.time}">HH:MM</p>
+                                <h3>Days of the Month:</h3>
+                                <ul>
+                                    <!-- If you store multiple days in daysOfMonth -->
+                                    <li th:each="day : ${maintenance.daysOfMonth}"
+                                        th:text="${day}">
+                                        1
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!-- YEARLY with single time + multiple yearlyDates -->
+                            <div th:case="'YEARLY'" class="maintenance-details-section">
+                                <h3>Time:</h3>
+                                <p th:text="${maintenance.time}">HH:MM</p>
+                                <h3>Dates in the Year:</h3>
+                                <ul>
+                                    <!-- Suppose each is a LocalDate with a dummy year (like 2000). We format as MM-dd. -->
+                                    <li th:each="d : ${maintenance.yearlyDates}"
+                                        th:text="${#temporals.format(d, 'MM-dd')}">
+                                        01-01
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div id="yearlyDiv" style="display: none;" class="form-group blu-margin">
+                            <label>Month:</label>
+                            <span th:switch="${maintenance.month}">
+                                <span th:case="1">January</span>
+                                <span th:case="2">February</span>
+                                <span th:case="3">March</span>
+                                <span th:case="4">April</span>
+                                <span th:case="5">May</span>
+                                <span th:case="6">June</span>
+                                <span th:case="7">July</span>
+                                <span th:case="8">August</span>
+                                <span th:case="9">September</span>
+                                <span th:case="10">October</span>
+                                <span th:case="11">November</span>
+                                <span th:case="12">December</span>
+                            </span>
+                            <br>
+                        </div>
+                        <script th:inline="javascript">
+                            document.addEventListener('DOMContentLoaded', function () {
+                                const recurringType = /*[[${maintenance.recurringType}]]*/ 'default';
+                                const elements = [
+                                    'timeDiv',
+                                    'weeklyDiv',
+                                    'monthlyDiv',
+                                    'yearlyDiv',
+                                    'noneDiv'
+                                ];
+
+                                function updateVisibility() {
+                                    elements.forEach(id => {
+                                        const element = document.getElementById(id);
+                                        if (element) {
+                                            element.style.display = "none";
+                                        }
+                                    });
+                                    switch (recurringType) {
+                                        case 'DAILY':
+                                            ['timeDiv'].forEach(id => {
+                                                const element = document.getElementById(id);
+                                                if (element) {
+                                                    element.style.display = "block";
+                                                }
+                                            });
+                                            break;
+                                        case 'WEEKLY':
+                                            ['timeDiv', 'weeklyDiv'].forEach(id => {
+                                                const element = document.getElementById(id);
+                                                if (element) {
+                                                    element.style.display = "block";
+                                                }
+                                            });
+                                            break;
+                                        case 'MONTHLY':
+                                            ['timeDiv', 'monthlyDiv'].forEach(id => {
+                                                const element = document.getElementById(id);
+                                                if (element) {
+                                                    element.style.display = "block";
+                                                }
+                                            });
+                                            break;
+                                        case 'YEARLY':
+                                            ['timeDiv', 'monthlyDiv', 'yearlyDiv'].forEach(id => {
+                                                const element = document.getElementById(id);
+                                                if (element) {
+                                                    element.style.display = "block";
+                                                }
+                                            });
+                                            break;
+                                    }
+                                }
+
+                                // Initialize visibility based on the initial value of recurringType
+                                updateVisibility();
+                            });
+                        </script>
+
+                        <!-- Creator & Assignee -->
+                        <div class="maintenance-details-section">
+                            <h3>Creator</h3>
+                            <p th:text="${maintenance.creator.user.username}
+            + ' -(' + ${maintenance.creator.user.firstName}
+            + ' ' + ${maintenance.creator.user.lastName} + ')'">
+                                Creator
+                            </p>
+                        </div>
+                        <div class="maintenance-details-section">
+                            <h3>Assignee</h3>
+                            <p th:text="${maintenance.assignee.user.username}
+            + ' -(' + ${maintenance.assignee.user.firstName}
+            + ' ' + ${maintenance.assignee.user.lastName} + ')'">
+                                Assignee
+                            </p>
+                        </div>
+
+                        <!-- Resolution & Status -->
+                        <div class="maintenance-details-section">
+                            <h3>Resolution</h3>
+                            <p th:if="${taskState.taskResolution}" class="resolution-green">RESOLVED</p>
+                            <p th:if="${!taskState.taskResolution}" class="resolution">NOT RESOLVED</p>
+                        </div>
+                        <div class="maintenance-details-section">
+                            <h3>Status</h3>
+                            <p th:if="${taskState.taskState}" class="state">NOT CLOSED</p>
+                            <p th:if="${!taskState.taskState}" class="state-red">CLOSED</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div>&nbsp;&nbsp;</div>
+
+                <!-- Active Tasks Table -->
+                <div class="d-flex justify-content-between">
+                    <h3 style="margin-top: auto">Active Tasks of Maintenance <span th:text="${maintenance.title}"></span>:</h3>
+                </div>
+
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Assignee</th>
+                        <th>Deadline</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <!-- Iterate through maintenance tasks -->
+                    <tr th:each="task : ${maintenance.tasks}"
+                        th:if="${task.taskState && task.deadline.compareTo(T(java.sql.Timestamp).valueOf(T(java.time.LocalDateTime).now())) >= 0}">
+                        <td th:text="${task.assignee != null ? task.assignee.user.username : 'Unassigned'}">Assignee
+                        </td>
+                        <td th:text="${#dates.format(task.deadline, 'yyyy-MM-dd HH:mm')}">Deadline</td>
+
+                        <td>
+                            <!-- Open/Close Task -->
+                            <!-- Show Close link if taskState is true (Open) -->
+                            <a style="text-align: left;"
+                               th:if="${task.taskState}"
+                               th:href="@{'/household/' + ${householdId} + '/maintenance/' + ${maintenanceId} + '/maintenanceTask/' + ${task.taskId} + '/close'}">
+                                <span>Close</span>
+                            </a>
+                            <!-- Show Open link if taskState is false (Closed) -->
+                            <a style="text-align: left;"
+                               th:unless="${task.taskState}"
+                               th:href="@{'/household/' + ${householdId} + '/maintenance/' + ${maintenanceId} + '/maintenanceTask/' + ${task.taskId} + '/open'}">
+                                <span>Open</span>
+                            </a>
+
+                            <!-- Edit Task -->
+                            <a style="text-align: left;"
+                               th:href="@{'/household/' + ${householdId} + '/maintenance/' + ${maintenanceId} + '/maintenanceTask/' + ${task.taskId} + '/edit'}">
+                                <span>Edit</span>
+                            </a>
+                            <!-- Delete Task -->
+                            <a style="text-align: left;"
+                               th:href="@{'/household/' + ${householdId} + '/maintenance/' + ${maintenanceId} + '/maintenanceTask/' + ${task.taskId} + '/delete'}"
+                               onclick="return confirm('Are you sure you want to delete this task?')">
+                                <span>Delete</span>
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <!-- Expired Tasks Table -->
+                <div class="d-flex justify-content-between">
+                    <h3 style="margin-top: auto">Expired Tasks of Maintenance <span
+                            th:text="${maintenance.title}"></span>:</h3>
+                </div>
+
+                <table class="mt-4">
+                    <thead>
+                    <tr class="bg-dark text-white">
+                        <th>Assignee</th>
+                        <th>Deadline</th>
+                        <th>Closing Date</th>
+                        <th>State</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="task : ${maintenance.tasks}"
+                        th:style="${((task.deadline.compareTo(T(java.sql.Timestamp).valueOf(T(java.time.LocalDateTime).now())) < 0 && task.taskState) ?
+               'background-color: red; color: white;' : '')}"
+                        th:if="${!task.taskState || task.deadline.compareTo(T(java.sql.Timestamp).valueOf(T(java.time.LocalDateTime).now())) < 0}">
+                        <!-- Assignee -->
+                        <td th:text="${task.assignee != null ? task.assignee.user.username : 'Unassigned'}">Assignee</td>
+                        <!-- Deadline -->
+                        <td th:text="${#dates.format(task.deadline, 'yyyy-MM-dd HH:mm')}">Deadline</td>
+                        <!-- Closing Date -->
+                        <td th:text="${task.closingDate != null ? #dates.format(task.closingDate, 'yyyy-MM-dd HH:mm') : 'Not Closed'}">Closing Date</td>
+                        <!-- State -->
+                        <td>
+                            <span th:text="${task.taskState ? 'Not Resolved' : 'Resolved'}"></span>
+                            <a style="text-align: left;"
+                               th:if="${task.taskState}"
+                               th:href="@{'/household/' + ${householdId} + '/maintenance/' + ${maintenanceId} + '/maintenanceTask/' + ${task.taskId} + '/close'}">
+                                <span>Close</span>
+                            </a>
+                            <a style="text-align: left;"
+                               th:if="${task.taskState}"
+                               th:href="@{'/household/' + ${householdId} + '/maintenance/' + ${maintenanceId} + '/maintenanceTask/' + ${task.taskId} + '/delete'}"
+                               onclick="return confirm('Are you sure you want to delete this task?')">
+                                <span>Delete</span>
+                            </a>
+                        </td>
+
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div>&nbsp;&nbsp;</div>
+            <div style="text-align: right;">
+                <div style="display: inline-block">
+                    <div>
+                        <a th:href="@{'/household/' + ${householdId} + '/maintenance/' + ${maintenanceId} + '/return'}">
+                            <button class="household-btn">Return</button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div>&nbsp;&nbsp;</div>
+</div>
+
+<script type="text/javascript" src="../../static/js/test.js" th:src="@{/js/test.js}"></script>
+</body>
+</html>

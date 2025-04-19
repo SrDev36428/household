@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" type="text/css" href="../../static/styles/style.css" th:href="@{'/styles/style.css'}">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:600&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous" />
+    <script src="https://kit.fontawesome.com/a81368914c.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+
+<div style="display: flex">
+    <div>
+        <div class="w3-sidebar w3-bar-block w3-border-right" id="sidebar">
+            <button onclick="w3_close()" class="w3-bar-item w3-large">Close &times;</button>
+            <a href="#" th:href="@{'/welcome'}" class="w3-bar-item w3-button">Main page</a>
+            <a th:href="@{/profile(sidebarType='default')}" class="w3-bar-item w3-button">Profile</a>
+            <a href="#" th:href="@{'/logout'}" class="w3-bar-item w3-button">Logout</a>
+        </div>
+        <button class="w3-button w3-teal w3-xlarge" onclick="w3_open()">Menu</button>
+    </div>
+
+    <div id="margin-100-for-shifting" style="flex-grow: 1; margin-left: 100px;">
+        <div class="p-4">
+            <div class="d-flex justify-content-between">
+                <h3>Invitations</h3>
+            </div>
+            <table class="mt-4">
+                <thead>
+                <tr class="bg-dark text-white">
+                    <th>Household</th>
+                    <th>Accept</th>
+                    <th>Decline</th>
+                </tr>
+                </thead>
+                <tr th:each="pendingHousehold : ${pendingHouseholds}">
+                    <td th:text="${pendingHousehold.household.title}">Household Title</td>
+                    <td><a href="#" th:href="@{'/household/' + ${pendingHousehold.household.id} + '/invitation/' +  ${pendingHousehold.id} + '/accept'}">Accept</a></td>
+                    <td><a href="#" th:href="@{'/household/' + ${pendingHousehold.household.id} + '/invitation/' + ${pendingHousehold.id} + '/decline'}">Decline</a></td>
+                </tr>
+            </table>
+        </div>
+
+
+        <div class="p-4">
+            <div class="d-flex justify-content-between">
+                <h3>My households</h3>
+                <a th:href="@{'/households/add'}"><button class="create-household-btn">+ Create new household</button></a>
+            </div>
+            <table class="mt-4">
+                <thead>
+                <tr class="bg-dark text-white">
+                    <th>Name</th>
+                    <th>Manage</th>
+                    <th>Leave</th>
+                </tr>
+                </thead>
+                <tr th:each="activeHousehold : ${activeHouseholds}">
+                    <td th:text="${activeHousehold.household.title}">My household</td>
+                    <td><a href="#" th:href="@{'/household/' + ${activeHousehold.household.id}
+            }">Manage</a></td>
+                    <td><a href="#" th:href="@{'/household/' + ${activeHousehold.id} + '/delete'}">Leave</a></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="../static/js/test.js" th:src="@{/js/test.js}"></script>
+</body>
+</html>

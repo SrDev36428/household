@@ -1,0 +1,87 @@
+stages:
+   - Build
+   - Test
+   - Vulnerability-Check
+   - SonarQube
+   - Javadoc
+   - Package
+
+services:
+   - postgres:13-alpine
+
+variables:
+   POSTGRES_DB: postgres
+   POSTGRES_USER: postgres
+   POSTGRES_PASSWORD: postgres
+   POSTGRES_HOST_AUTH_METHOD: trust
+
+application build:
+   image: maven:3.8.3-openjdk-17
+   stage: Build
+   when: always
+   variables:
+      SPRING_PROFILES_ACTIVE: dev
+   script:
+      - mvn package -DskipTests
+
+application test:
+   image: maven:3.8.3-openjdk-17
+   stage: Test
+   when: on_success
+   allow_failure: true
+   script:
+      - mvn test
+
+application sonarqube:
+   image: maven:3.6.3-jdk-11
+   stage:  SonarQube
+   allow_failure: true
+   variables:
+      SONAR_TOKEN: "${SQ_TOKEN}"
+      SONAR_HOST_URL: "${SQ_URL}"
+      GIT_DEPTH: 0
+   script:
+         - mvn verify dependency-check:aggregate sonar:sonar -Dsonar.projectKey=$SQ_PROJECT -Dsonar.projectName=$SQ_PROJECT -Dsonar.qualitygate.wait=true -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml -Dsonar.dependencyCheck.htmlReportPath=target/site/dependency-check-report.html -Dsonar.dependencyCheck.xmlReportPath=target/site/dependency-check-report.xml  -Dsonar.dependencyCheck.jsonReportPath=target/site/dependency-check-report.json  #-DskipTests
+
+dependency-check:
+   stage: Vulnerability-Check
+   image: maven:3.8.3-openjdk-17
+   script:
+      - mvn dependency-check:check
+   allow_failure: false
+   retry:
+      max: 2
+      when:
+         - always
+   cache:
+      paths:
+         - target/dependency-check-data/
+   artifacts:
+      paths:
+         - target/site/dependency-check-report.html
+         - target/site/dependency-check-report.xml
+      expire_in: 1 week
+
+javadoc generation:
+   stage: Javadoc
+   image: maven:3.8.3-openjdk-17
+   script:
+      - mvn javadoc:javadoc
+   artifacts:
+      paths:
+         - target/site/apidocs/
+
+application package:
+   stage: Package
+   image: $CI_REGISTRY/ict/images/alpine/ci:latest
+   variables:
+      BUILDAH_ISOLATION: chroot
+   when: manual
+   before_script:
+      - apk add buildah fuse-overlayfs
+      - buildah login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+   script:
+      - buildah build -t $CI_REGISTRY_IMAGE/$CI_COMMIT_BRANCH:$CI_COMMIT_SHORT_SHA -f Dockerfile
+      - buildah push --retry 3 $CI_REGISTRY_IMAGE/$CI_COMMIT_BRANCH:$CI_COMMIT_SHORT_SHA
+   rules:
+      - if: '$CI_COMMIT_BRANCH'
