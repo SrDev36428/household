@@ -30,7 +30,8 @@ public class MaintenanceAddedListener implements ApplicationListener<Maintenance
         Log log = new Log();
         log.setHouseholdId(event.getMaintenance().getHouseHoLD().getId());
         log.setMessage("Created by: " + username + ", Date: " +
-                LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant() + ".");
+                LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()
+                + ", location: Maintenances Page, status: created Maintenances");
         logDAO.saveLog(log);
     }
 }

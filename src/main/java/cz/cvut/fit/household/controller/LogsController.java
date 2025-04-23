@@ -9,10 +9,14 @@ package cz.cvut.fit.household.controller;
 
 import cz.cvut.fit.household.daos.interfaces.LogDAO;
 import cz.cvut.fit.household.datamodel.entity.household.Household;
+import cz.cvut.fit.household.datamodel.entity.user.User;
 import cz.cvut.fit.household.exception.NonExistentEntityException;
 import cz.cvut.fit.household.service.interfaces.HouseHoldService;
+import cz.cvut.fit.household.service.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,6 +34,7 @@ public class LogsController {
 
     private final LogDAO logDAO;
     private final HouseHoldService houseHoldService;
+    private final UserService userService;  
 
     private static final String DOES_NOT_EXIST = " doesn't exist";
     private static final String HOUSEHOLD_WITH_ID = "Household With id: ";
@@ -37,7 +42,14 @@ public class LogsController {
 
     @GetMapping("/{householdId}/logs")
     public String renderLogsPage(@PathVariable Long householdId,
-                                 Model model) {
+            Model model) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        log.debug("Finding user - {}", username);
+        User user = userService.findUserByUsername(username)
+                .orElseThrow(() -> {
+                    log.error("User with username : {} not found", username);
+                    return new NonExistentEntityException("User with username: " + username + " doesn't exist");
+                });
         Household houseHold = houseHoldService.findHouseHoldById(householdId)
                 .orElseThrow(() -> {
                     log.error(HOUSEHOLD_WITH_ID + "{}" + DOES_NOT_EXIST, householdId);
@@ -46,15 +58,18 @@ public class LogsController {
 
         model.addAttribute(HOUSEHOLD_ATTR, houseHold);
         model.addAttribute("householdId", householdId);
+        model.addAttribute("username", user.getUsername());
+        model.addAttribute("email", user.getEmail());
         model.addAttribute("logs", logDAO.findLogByHouseholdIdOrderByIdDesc(householdId));
         return "logs";
     }
 
-    @GetMapping("/{householdId}/logs/delete")
+    @GetMapping("/{householdId}/logs/{logId}/delete")
     @Transactional
-    public RedirectView deleteAllLogs(@PathVariable Long householdId) {
-        logDAO.deleteAllLogsByHouseholdId(householdId);
-        log.debug("Deleted all logs for household with id - {}", householdId);
+    public RedirectView deleteLogById(@PathVariable Long householdId, 
+                                    @PathVariable Long logId) {
+        logDAO.deleteLogById(logId);
+        log.debug("Deleted log with id - {} for household with id - {}", logId, householdId);
         return new RedirectView("/household/" + householdId + "/logs");
     }
 }

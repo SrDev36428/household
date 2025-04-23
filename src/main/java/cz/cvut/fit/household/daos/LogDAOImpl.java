@@ -20,8 +20,8 @@ public class LogDAOImpl implements LogDAO {
     }
 
     @Override
-    public void deleteAllLogsByHouseholdId(Long id) {
-        logRepository.deleteAllByHouseholdId(id);
+    public void deleteLogById(Long id) {
+        logRepository.deleteById(id);
     }
 
     @Override

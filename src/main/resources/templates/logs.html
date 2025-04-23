@@ -1,55 +1,622 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
-  <title>Logs</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-  <link rel="stylesheet" type="text/css" href="../../static/styles/style.css" th:href="@{'/styles/style.css'}">
-  <link href="https://fonts.googleapis.com/css?family=Poppins:600&display=swap" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous" />
-  <script src="https://kit.fontawesome.com/a81368914c.js"></script>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Activity Logs</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
+  <style>
+    * {
+      font-family: 'Times New Roman', Times, serif
+    }
 
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-content {
+      background-color: white;
+      margin: auto;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .modal-header {
+      padding: 20px;
+    }
+
+    .modal-body {
+      padding: 20px;
+    }
+
+    .btn-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+  </style>
 </head>
-<body>
 
-<div style="display: flex">
-  <div th:insert="~{fragments/fragments :: sidebar}"></div>
+<body class="bg-gray-100 flex">
+  <nav class="w-64 bg-white shadow-md py-4 h-screen">
+    <h1 class="text-[25px] font-bold text-center">HouseholdWeb</h1>
+    <div class="mt-14 text-[20px]">
+      <div class="w-full cursor-pointer">
+        <a href="#" th:href="@{'/welcome'}"><i class="fa fa-tachometer pl-4 mb-3"></i>&nbsp;&nbsp;&nbsp; Dashboard</a>
+      </div>
+      <div class="w-full cursor-pointer">
+        <i class="fa fa-house pl-4 mb-3"></i>&nbsp;&nbsp;&nbsp; Household
+      </div>
+      <div class="w-full cursor-pointer">
+        <i class="fa fa-briefcase pl-4 mb-3"></i>&nbsp;&nbsp;&nbsp; Inventory
+      </div>
+      <div class="w-full cursor-pointer">
+        <i class="fa fa-wrench pl-4 mb-3"></i>&nbsp;&nbsp;&nbsp; Maintenances
+      </div>
+      <div class="w-full cursor-pointer">
+        <i class="fa fa-tasks pl-4 mb-3"></i>&nbsp;&nbsp;&nbsp; My Tasks
+      </div>
+      <div class=" w-full cursor-pointer bg-gray-300 align-middle">
+        <i class="fa fa-history pl-4 mb-3"></i>&nbsp;&nbsp;&nbsp; Activity Log
+      </div>
+    </div>
+    <div class="absolute bottom-0 pl-6 flex flex-col justify-center text-center text-[20px]">
+      <div th:text="${username}"></div>
+      <div th:text="${email}"></div>
+      <a th:href="@{'/logout'}" class="btn btn-outline-secondary">Logout</a>
+    </div>
+  </nav>
 
-  <div>&nbsp;&nbsp;</div>
-  <div>&nbsp;&nbsp;</div>
+  <div class="w-100">
+    <div class="container mx-auto p-4 md:p-8 max-w-8xl">
+      <!-- Header -->
+      <div class="flex justify-between items-center">
+        <div class="mb-6">
+          <h1 class="text-2xl md:text-3xl font-bold text-gray-800">
+            Activity Logs
+          </h1>
+          <p class="text-gray-600 mt-2">
+            Track all activities and changes in your household
+          </p>
+        </div>
+        <div>
+          <button class="bg-white p-2.5 rounded-md text-base">
+            <i class="fas fa-search"></i> Search activities
+          </button>
+        </div>
+      </div>
 
-  <div id="margin-100-for-shifting" style="flex-grow: 1; margin-left: 100px;">
-    <div class="p-4">
-
-      <div style="text-align: right;">
-        <div style="display: inline-block">
+      <!-- Filters Section -->
+      <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
-            <a th:href="@{'/household/' + ${householdId} + '/logs/delete'}"><button class="create-household-btn">Clear logs</button></a>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              <i class="fas fa-map-marker-alt mr-1 text-gray-400"></i>Location
+            </label>
+            <select id="locationFilter" class="form-select w-full border-gray-300 rounded-md shadow-sm">
+              <option value="all">All Locations</option>
+              <!-- Dynamic locations will be inserted here -->
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              <i class="fas fa-user mr-1 text-gray-400"></i>User
+            </label>
+            <select id="userFilter" class="form-select w-full border-gray-300 rounded-md shadow-sm">
+              <option value="all">All Users</option>
+              <!-- Dynamic users will be inserted here -->
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              <i class="fas fa-calendar-alt mr-1 text-gray-400"></i>Date
+            </label>
+            <input type="date" id="dateFilter" class="form-control w-full border-gray-300 rounded-md shadow-sm"
+              placeholder="mm/dd/yyyy">
+          </div>
+          <div class="flex items-end">
+            <button id="applyFilters"
+              class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md transition duration-200">
+              <i class="fas fa-check mr-1"></i>Apply Filters
+            </button>
           </div>
         </div>
       </div>
 
-
-      <div class="d-flex justify-content-between">
-        <h3>Logs:</h3>
+      <!-- Activity Log list -->
+      <div>
+        <table class="border-collapse mx-auto w-full bg-white rounded-lg text-base">
+          <thead>
+            <tr class="border-b-2 p-3 text-gray-400">
+              <th class="p-3">Timestamp</th>
+              <th class="p-3">Description</th>
+              <th class="p-3">Location</th>
+              <th class="p-3">User</th>
+              <th class="p-3">Action</th>
+            </tr>
+          </thead>
+          <tbody id="activityTableBody">
+            <!-- Dynamic activity logs will be inserted here -->
+          </tbody>
+        </table>
+        <div class="mt-3 flex justify-end">
+          <button id="prevPage" class="btn btn-outline-secondary mr-1 border-gray-300 text-gray-900">Previous</button>
+          <div id="paginationNumbers" class="flex">
+            <!-- Pagination numbers will be inserted here -->
+          </div>
+          <button id="nextPage" class="btn btn-outline-secondary border-gray-300 text-gray-900">Next</button>
+        </div>
       </div>
-      <table class="mt-4">
-        <thead>
-        <tr class="bg-dark text-white">
-          <th>Description</th>
-        </tr>
-        </thead>
-        <tr th:each="log : ${logs}">
-          <td th:text="${log.message}">description</td>
-        </tr>
-      </table>
     </div>
   </div>
-</div>
 
-<script type="text/javascript" src="../../static/js/test.js" th:src="@{/js/test.js}"></script>
+  <div class="modal" id="infoModal">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <!-- Modal Header -->
+        <div class="modal-header items-start border-b-0 justify-start flex-col">
+          <div class="flex justify-between w-full items-center">
+            <h1 class="modal-title text-2xl font-bold">Activity Log Details</h1>
+            <button type="button" onclick="hideInfo()" class="btn btn-close" data-bs-dismiss="modal">X</button>
+          </div>
+          <h4 class="modal-title" id="modalActivityDescription">Updated inventory item: Milk (2 gallons)
+          </h4>
+        </div>
+
+        <!-- Modal body -->
+        <div class="modal-body">
+          <div class="w-full flex justify-start bg-gray-50 p-3">
+            <div class="w-2/6">
+              <h2 class="text-gray-500 pb-1">Timestamp</h2>
+              <h2 id="modalTimestamp">2025-01-15 14:30</h2>
+            </div>
+            <div class="w-2/6">
+              <h2 class="text-gray-500 pb-1">Location</h2>
+              <h2 id="modalLocation">Inventory Page</h2>
+            </div>
+            <div class="w-2/6">
+              <h2 class="text-gray-500 pb-1">User</h2>
+              <h2 id="modalUser"><i class="fa fa-user"></i> Ananya Singh</h2>
+            </div>
+          </div>
+
+          <h1 class="py-3 font-bold text-xl">Activity Details</h1>
+          <div class="mb-8" id="modalActivityDetails">
+            <!-- Dynamic content will be inserted here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script th:inline="javascript">
+    function returnLocalTimeStamp(utcTimestamp) {
+      const date = new Date(utcTimestamp);
+      const localTime = date.toLocaleString();
+
+      return localTime;
+    }
+
+    let logsList = [[${ logs }]];
+    console.log(logsList);
+    let logs = [], logsIds = [];
+    logsList.forEach(item => {
+      logs.push(item.message);
+      logsIds.push(item.id);
+    });
+
+    let id = 0;
+    function parseDescription(description) {
+      const data = {};
+      console.log(description);
+      data.id = logsIds[id];
+      id++;
+      // Extract status (created/updated/deleted)
+      const statusMatch = description.match(/status:\s(\w+)/);
+      if (statusMatch) {
+        data.status = statusMatch[1];
+      }
+
+      // Extract changes
+      const changeMatch = description.match(/change:\{([^\}]+)\}/);
+      if (changeMatch) {
+        data.change = [];
+        const changes = changeMatch[1].split(', ');
+        changes.forEach(change => {
+          const [field, values] = change.split('=');
+          const [oldValue, newValue] = values.split(' → ');
+          data.change.push({ field, old: oldValue, new: newValue });
+        });
+      }
+
+      // Extract creator and date
+      const createdByMatch = description.match(/Created by:\s([^\s,]+)/);
+      if (createdByMatch) {
+        data.createdBy = createdByMatch[1];
+      }
+
+      const dateMatch = description.match(/Date:\s([^\s,]+)/);
+      if (dateMatch) {
+        data.date = dateMatch[1];
+      }
+
+      // Extract other fields like item, title, maxQuantity, etc.
+      const itemMatch = description.match(/item:(\d+)/);
+      if (itemMatch) {
+        data.item = itemMatch[1];
+      }
+
+      const titleMatch = description.match(/title:\s([^\s,]+)/);
+      if (titleMatch) {
+        data.title = titleMatch[1];
+      }
+
+      const maxQuantityMatch = description.match(/maxQuantity:\s(\d+\.?\d*)/);
+      if (maxQuantityMatch) {
+        data.maxQuantity = parseFloat(maxQuantityMatch[1]);
+      }
+
+      const currentQuantityMatch = description.match(/currentQuantity:\s(\d+\.?\d*)/);
+      if (currentQuantityMatch) {
+        data.currentQuantity = parseFloat(currentQuantityMatch[1]);
+      }
+
+      const expirationMatch = description.match(/expiration:\s([^\n,]+)/);
+      if (expirationMatch) {
+        const dateStr = expirationMatch[1];
+        // Parse the date string (e.g., "Wed Apr 23 00:00:00 PDT 2025")
+        const date = new Date(dateStr);
+
+        // Handle cases where the Date parsing fails (returns invalid date)
+        if (!isNaN(date.getTime())) {
+          // Convert to ISO 8601 format with timezone
+          data.expiration = date.toISOString();
+        } else {
+          // Fallback to original string if parsing fails
+          data.expiration = dateStr;
+        }
+      }
+
+      const locationMatch = description.match(/location\s*:\s([^,\.]+)/);
+      if (locationMatch) data.location = locationMatch[1];
+
+      // Add the new fields for amount and nowAmount
+      const amountMatch = description.match(/amount\s*:\s*(\d+\.?\d*)/);
+      if (amountMatch) {
+        data.amount = parseFloat(amountMatch[1]);
+      }
+
+      const nowAmountMatch = description.match(/nowAmount\s*:\s*(\d+\.?\d*)/);
+      if (nowAmountMatch) {
+        data.nowAmount = parseFloat(nowAmountMatch[1]);
+      }
+
+      return data;
+    }
+
+    let Actlogs = logs.map(parseDescription);
+    console.log(Actlogs);
+    const locations = [...new Set(Actlogs.filter(item => item.location).map(item => item.location))];
+    console.log(locations);
+    const users = [...new Set(Actlogs.filter(item => item.createdBy).map(item => item.createdBy))];
+    console.log(users);
+
+    // Pagination variables
+    let currentPage = 1;
+    const rowsPerPage = 5;
+    let filteredLogs = [...Actlogs];
+
+    document.addEventListener('DOMContentLoaded', function () {
+      // Populate location filter
+      const locationFilter = document.getElementById('locationFilter');
+      locations.forEach(locationItem => {
+        const option = document.createElement('option');
+        option.value = locationItem;
+        option.textContent = locationItem;
+        locationFilter.appendChild(option);
+      });
+
+      // Populate user filter
+      const userFilter = document.getElementById('userFilter');
+      users.forEach(user => {
+        const option = document.createElement('option');
+        option.value = user;
+        option.textContent = user;
+        userFilter.appendChild(option);
+      });
+
+      // Set up event listeners
+      document.getElementById('applyFilters').addEventListener('click', applyFilters);
+      document.getElementById('prevPage').addEventListener('click', goToPreviousPage);
+      document.getElementById('nextPage').addEventListener('click', goToNextPage);
+
+      // Initial render
+      renderTable();
+      renderPagination();
+    });
+
+    // Apply filters
+    function applyFilters() {
+      const location = document.getElementById('locationFilter').value;
+      const user = document.getElementById('userFilter').value;
+      const date = document.getElementById('dateFilter').value;
+
+      filteredLogs = Actlogs.filter(log => {
+        const matchesLocation = location === 'all' || log.location === location;
+        const matchesUser = user === 'all' || log.createdBy === user;
+        const matchesDate = !date || log.timestamp.startsWith(date);
+
+        return matchesLocation && matchesUser && matchesDate;
+      });
+
+      currentPage = 1;
+      renderTable();
+      renderPagination();
+    }
+
+    // Render the table with current page data
+    function renderTable() {
+      const tableBody = document.getElementById('activityTableBody');
+      tableBody.innerHTML = '';
+
+      const startIndex = (currentPage - 1) * rowsPerPage;
+      const endIndex = startIndex + rowsPerPage;
+      const paginatedLogs = filteredLogs.slice(startIndex, endIndex);
+
+      if (paginatedLogs.length === 0) {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td colspan="5" class="p-3 text-center text-gray-500">No activity logs found</td>`;
+        tableBody.appendChild(row);
+        return;
+      }
+
+      paginatedLogs.forEach(log => {
+        const row = document.createElement('tr');
+        row.className = 'border-b';
+        let changeStr = "";
+        if (log.status === "updated") {
+          for (let i = 0; i < log.change.length; i++) {
+            changeStr += log.change[i].field + "," + log.change[i].old + "->" + log.change[i].new;
+          }
+        }
+
+        row.innerHTML = `
+						<td class="p-3">${returnLocalTimeStamp(log.date)}</td>
+						<td class="p-3">${log.status} Items ${log.status === "updated" ? `${changeStr.slice(0, 30)}` : ""}</td>
+						<td class="p-3">${log.location}</td>
+						<td class="p-3">${log.createdBy}</td>
+						<td class="p-3">
+            
+              <i class="fas fa-info-circle cursor-pointer text-blue-500 hover:text-blue-700" onclick="showInfo(${log.id})"></i>
+							<a href="#" class="delete-log-btn" data-log-id="${log.id}">
+                <i class="fas fa-trash cursor-pointer text-red-500 hover:text-red-700"></i>
+              </a>
+						</td>
+					`;
+        tableBody.appendChild(row);
+      });
+    }
+
+    function renderPagination() {
+      const paginationDiv = document.getElementById('paginationNumbers');
+      paginationDiv.innerHTML = '';
+
+      const totalPages = Math.ceil(filteredLogs.length / rowsPerPage);
+
+      // Always show first page
+      addPageButton(1, paginationDiv);
+
+      // Show ellipsis if needed
+      if (currentPage > 3) {
+        const ellipsis = document.createElement('span');
+        ellipsis.className = 'mx-1';
+        ellipsis.textContent = '...';
+        paginationDiv.appendChild(ellipsis);
+      }
+
+      // Show current page and neighbors
+      const startPage = Math.max(2, currentPage - 1);
+      const endPage = Math.min(totalPages - 1, currentPage + 1);
+
+      for (let i = startPage; i <= endPage; i++) {
+        addPageButton(i, paginationDiv);
+      }
+
+      // Show ellipsis if needed
+      if (currentPage < totalPages - 2) {
+        const ellipsis = document.createElement('span');
+        ellipsis.className = 'mx-1';
+        ellipsis.textContent = '...';
+        paginationDiv.appendChild(ellipsis);
+      }
+
+      // Always show last page if there's more than one page
+      if (totalPages > 1) {
+        addPageButton(totalPages, paginationDiv);
+      }
+
+      // Disable/enable previous/next buttons
+      document.getElementById('prevPage').disabled = currentPage === 1;
+      document.getElementById('nextPage').disabled = currentPage === totalPages;
+    }
+
+    function addPageButton(pageNumber, container) {
+      const button = document.createElement('button');
+      button.className = `btn btn-outline-secondary mr-1 border-gray-300 text-gray-900 ${currentPage === pageNumber ? 'bg-gray-200' : ''}`;
+      button.textContent = pageNumber;
+      button.addEventListener('click', () => {
+        currentPage = pageNumber;
+        renderTable();
+        renderPagination();
+      });
+      container.appendChild(button);
+    }
+
+    function goToPreviousPage() {
+      if (currentPage > 1) {
+        currentPage--;
+        renderTable();
+        renderPagination();
+      }
+    }
+
+    function goToNextPage() {
+      const totalPages = Math.ceil(filteredLogs.length / rowsPerPage);
+      if (currentPage < totalPages) {
+        currentPage++;
+        renderTable();
+        renderPagination();
+      }
+    }
+
+    function showInfo(id) {
+      const log = filteredLogs.find(item => item.id === id);
+      console.log(log);
+      if (!log) return;
+
+      // Update basic info
+      document.getElementById('modalActivityDescription').textContent = log.status + " Item";
+      document.getElementById('modalTimestamp').textContent = returnLocalTimeStamp(log.date);
+      document.getElementById('modalLocation').textContent = log.location;
+      document.getElementById('modalUser').innerHTML = `<i class="fa fa-user"></i> ${log.createdBy}`;
+
+      const detailsDiv = document.getElementById('modalActivityDetails');
+      detailsDiv.innerHTML = '';
+
+      // Add changes if they exist
+      if (log.change && log.change.length) {
+        const changesTitle = document.createElement('h2');
+        changesTitle.className = 'text-xl font-bold mb-3';
+        changesTitle.textContent = 'Changes Made:';
+        detailsDiv.appendChild(changesTitle);
+
+        log.change.forEach(item => {
+          const fieldHeader = document.createElement('h3');
+          fieldHeader.className = 'text-lg font-semibold mt-4 mb-2';
+          fieldHeader.textContent = item.field.charAt(0).toUpperCase() + item.field.slice(1);
+          detailsDiv.appendChild(fieldHeader);
+
+          const grid = document.createElement('div');
+          grid.className = 'grid grid-cols-2 gap-2 mb-4';
+
+          const oldValueDiv = document.createElement('div');
+          oldValueDiv.className = 'bg-red-50 p-2 rounded text-red-600';
+          oldValueDiv.innerHTML = `<span class="font-medium">Old:</span> ${item.old || 'None'}`;
+
+          const newValueDiv = document.createElement('div');
+          newValueDiv.className = 'bg-green-50 p-2 rounded text-green-600';
+          newValueDiv.innerHTML = `<span class="font-medium">New:</span> ${item.new || 'None'}`;
+
+          grid.appendChild(oldValueDiv);
+          grid.appendChild(newValueDiv);
+          detailsDiv.appendChild(grid);
+        })
+      } else {
+        // If no changes, just show the description
+        if (log.status === "decreased" || log.status === "increased") {
+          const fieldHeader = document.createElement('h3');
+          fieldHeader.className = 'text-lg font-semibold mt-4 mb-2';
+          fieldHeader.textContent = "Quantity";
+          detailsDiv.appendChild(fieldHeader);
+
+          const grid = document.createElement('div');
+          grid.className = 'grid grid-cols-2 gap-2 mb-4';
+
+          const oldValueDiv = document.createElement('div');
+          oldValueDiv.className = 'bg-red-50 p-2 rounded text-red-600';
+          oldValueDiv.innerHTML = `<span class="font-medium">Old:</span> ${log.amount || 'None'}`;
+
+          const newValueDiv = document.createElement('div');
+          newValueDiv.className = 'bg-green-50 p-2 rounded text-green-600';
+          newValueDiv.innerHTML = `<span class="font-medium">New:</span> ${log.nowAmount || 'None'}`;
+
+          grid.appendChild(oldValueDiv);
+          grid.appendChild(newValueDiv);
+          detailsDiv.appendChild(grid);
+        } else if (log.status === "created") {
+          if (log.location === "Maintenances Page") {
+            const descPara = document.createElement('h3');
+            descPara.className = 'text-lg font-semibold mt-4 mb-2';
+            descPara.textContent = "Created Maintenances Page";
+            detailsDiv.appendChild(descPara);
+          } else {
+            const fieldHeader = document.createElement('h3');
+            fieldHeader.className = 'text-lg font-semibold mt-4 mb-2';
+            fieldHeader.textContent = "Quantity";
+            detailsDiv.appendChild(fieldHeader);
+
+            const grid = document.createElement('div');
+            grid.className = 'grid grid-cols-2 gap-2 mb-4';
+
+            const oldValueDiv = document.createElement('div');
+            oldValueDiv.className = 'bg-red-50 p-2 rounded text-red-600';
+            oldValueDiv.innerHTML = `<span class="font-medium">MaxQuantity:</span> ${log.maxQuantity || 'None'}`;
+
+            const newValueDiv = document.createElement('div');
+            newValueDiv.className = 'bg-green-50 p-2 rounded text-green-600';
+            newValueDiv.innerHTML = `<span class="font-medium">CurrentQuantity:</span> ${log.currentQuantity || 'None'}`;
+
+            grid.appendChild(oldValueDiv);
+            grid.appendChild(newValueDiv);
+            detailsDiv.appendChild(grid);
+
+            const grid1 = document.createElement('div');
+            grid1.className = 'grid grid-cols-1 gap-2 mb-4';
+            const secfieldHeader = document.createElement('h3');
+            secfieldHeader.className = 'text-lg font-semibold mt-4 mb-2';
+            secfieldHeader.textContent = "Expiration";
+            detailsDiv.appendChild(secfieldHeader);
+
+            const valueDiv = document.createElement('div');
+            valueDiv.className = 'bg-red-50 p-2 rounded text-red-600';
+            valueDiv.innerHTML = `<span class="font-medium">Expiration:</span> ${returnLocalTimeStamp(log.expiration) || 'None'}`;
+
+            grid1.appendChild(valueDiv);
+            detailsDiv.appendChild(grid1);
+          }
+        }
+      }
+
+      $("#infoModal").fadeIn();
+    }
+
+    function hideInfo() {
+      $("#infoModal").fadeOut();
+    }
+
+    document.addEventListener('click', function (e) {
+      if (e.target.closest('.delete-log-btn')) {
+        e.preventDefault();
+        const btn = e.target.closest('.delete-log-btn');
+        const logId = btn.getAttribute('data-log-id');
+        const householdId = [[${ householdId }]]; // Thymeleaf injected value
+
+        if (confirm('Are you sure you want to delete this log?')) {
+          window.location.href = `/household/${householdId}/logs/${logId}/delete`;
+        }
+      }
+    });
+
+  </script>
+
+  <script type="text/javascript" src="../../static/js/test.js" th:src="@{/js/test.js}"></script>
 </body>
+
 </html>

@@ -34,7 +34,7 @@ public class InventoryChangeListener implements
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         Log log = new Log();
         log.setHouseholdId(event.getHouseholdId());
-        log.setMessage(event.getDescription() + ". Created by: " + username + ", Date: " + LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()+".");
+        log.setMessage(event.getDescription() + ". Created by: " + username + ", Date: " + LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant());
         logDAO.saveLog(log);
     }
 }

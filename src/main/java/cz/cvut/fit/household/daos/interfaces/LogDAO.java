@@ -21,11 +21,11 @@ public interface LogDAO {
     Log saveLog(Log log);
 
     /**
-     * Deletes all logs associated with a specific household by its unique id.
+     * Deletes a specific log by its unique id.
      *
-     * @param id The unique id of the household for which logs should be deleted.
+     * @param id The unique id of the log to be deleted.
      */
-    void deleteAllLogsByHouseholdId(Long id);
+    void deleteLogById(Long id);
 
     /**
      * Retrieves a list of Log entities for a specific household, ordered by ID in descending order.
